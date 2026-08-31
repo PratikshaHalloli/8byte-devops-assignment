@@ -1,0 +1,14 @@
+# Terraform temp and state files
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Node modules & logs
+node_modules/
+npm-debug.log

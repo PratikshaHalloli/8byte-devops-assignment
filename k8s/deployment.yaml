@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 8byte-app
+  labels:
+    app: 8byte-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: 8byte-app
+  template:
+    metadata:
+      labels:
+        app: 8byte-app
+    spec:
+      containers:
+      - name: 8byte-app
+        image: 799442263888.dkr.ecr.us-east-1.amazonaws.com/8byte-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_HOST
+          value: "eight-byte-postgres-staging.c8pcymwoeja5.us-east-1.rds.amazonaws.com"
+        - name: DB_PORT
+          value: "5432"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
