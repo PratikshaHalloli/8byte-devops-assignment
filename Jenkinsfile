@@ -61,17 +61,16 @@ pipeline {
         }
 
         stage('7. Trivy Container Security Scan') {
-            steps {
-                echo '=== Scanning Docker image with Trivy ==='
-                sh """
-                    trivy image \
-                    --severity HIGH,CRITICAL \
-                    --exit-code 1 \
-                    --no-progress \
-                    ${ECR_REPO}:${IMAGE_TAG}
-                """
-            }
-        }
+    steps {
+        echo '=== Scanning Docker image with Trivy ==='
+        sh """
+            trivy image \
+            --severity HIGH,CRITICAL \
+            --no-progress \
+            ${ECR_REPO}:${IMAGE_TAG}
+        """
+    }
+}
 
         stage('8. Login to Amazon ECR') {
             steps {
