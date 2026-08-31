@@ -1,12 +1,4 @@
-pipeline {
-    agent any
 
-    environment {
-        AWS_ACCOUNT_ID = '799442263888'
-        AWS_REGION     = 'us-east-1'
-        ECR_REPO       = '8byte-app'
-        IMAGE_URI      = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${BUILD_NUMBER}"
-    }first Jenkins file
 
 pipeline {
     agent any
