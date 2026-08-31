@@ -27,6 +27,8 @@ helm install loki-stack grafana/loki-stack \
   -f monitoring/loki-values.yaml
 \`\`\`
 
+See [\`loki-values.yaml\`](./loki-values.yaml) — persistence is disabled (\`loki.persistence.enabled: false\`), so log storage is ephemeral and does not survive a Loki pod restart. Acceptable for this assignment's demo scope; a production setup would enable a PersistentVolumeClaim.
+
 Promtail runs as a DaemonSet on every node and ships container stdout/stderr logs to Loki — covers application and system/pod logs.
 
 ## Accessing Grafana
@@ -52,3 +54,4 @@ Add Loki as a Grafana datasource (Connections → Data sources → Add → Loki,
 
 - App-level metrics (request rate, error rate, latency from the Node.js app) and RDS-level metrics are not yet scraped by Prometheus. Would need \`prom-client\` instrumentation added to \`app/index.js\` exposing a \`/metrics\` endpoint, plus a \`postgres_exporter\` for the database.
 - No access-log capture at an ingress layer, since the app is exposed via a plain \`LoadBalancer\` Service rather than an Ingress controller.
+- Loki log storage is ephemeral (persistence disabled) — logs are lost on pod restart.
