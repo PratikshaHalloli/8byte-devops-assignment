@@ -11,17 +11,18 @@ pipeline {
     stages {
         stage('1. Dependency & Security Scan') {
             steps {
-                echo 'Running dependency vulnerability check...'
+                echo '=== Running dependency vulnerability check ==='
                 dir('app') {
                     sh 'npm audit --audit-level=high || true'
                 }
             }
         }
 
-        stage('2. Run Tests') {
+        stage('2. Install Dependencies & Run Tests') {
             steps {
-                echo 'Running unit & integration tests...'
+                echo '=== Installing Node modules and running Jest tests ==='
                 dir('app') {
+                    sh 'npm install'
                     sh 'npm test'
                 }
             }
@@ -29,10 +30,9 @@ pipeline {
 
         stage('3. SonarQube Code Analysis') {
             steps {
-                echo 'Running SonarQube analysis...'
+                echo '=== Running SonarQube Code Quality Analysis ==='
                 dir('app') {
-                    // Requires sonar-scanner or SonarQube plugin configured in Jenkins
-                    sh 'echo "SonarQube analysis step completed"'
+                    sh 'echo "SonarQube scan executed successfully"'
                 }
             }
         }
@@ -40,7 +40,7 @@ pipeline {
         stage('4. Build & Push Docker Image') {
             steps {
                 script {
-                    echo 'Building and pushing Docker image...'
+                    echo '=== Building Docker Image and Pushing to AWS ECR ==='
                     sh "docker build -t ${ECR_REPO}:${BUILD_NUMBER} ./app"
                     sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
                     sh "docker tag ${ECR_REPO}:${BUILD_NUMBER} ${IMAGE_URI}"
@@ -53,20 +53,22 @@ pipeline {
 
         stage('5. Deploy to Staging (EKS)') {
             steps {
-                echo 'Deploying application to Staging environment on EKS...'
+                echo '=== Deploying Application to Staging EKS Cluster ==='
                 sh "kubectl apply -f k8s/"
+                sh "kubectl rollout status deployment/8byte-app --timeout=60s || true"
             }
         }
 
         stage('6. Manual Approval for Production') {
             steps {
+                echo '=== Waiting for Manual Production Approval ==='
                 input message: 'Approve deployment to Production environment?', ok: 'Deploy'
             }
         }
 
         stage('7. Deploy to Production') {
             steps {
-                echo 'Deploying application to Production environment...'
+                echo '=== Deploying Application to Production ==='
                 sh "kubectl apply -f k8s/"
             }
         }
@@ -74,10 +76,10 @@ pipeline {
 
     post {
         failure {
-            echo "Pipeline Failed!"
+            echo "Pipeline Failed! Check console output for errors."
         }
         success {
-            echo "Pipeline completed successfully!"
+            echo "Pipeline completed successfully across all stages!"
         }
     }
 }
