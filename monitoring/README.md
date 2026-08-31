@@ -9,9 +9,10 @@ Deployed via Helm: Prometheus, Grafana, Alertmanager, node-exporter, kube-state-
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
-  -n monitoring --create-namespace \
-  -f monitoring/prometheus-grafana-values.yaml
+  -n monitoring --create-namespace
 \`\`\`
+
+Installed with chart defaults — no custom values overrides were needed for this assignment.
 
 Covers infrastructure metrics — CPU/memory per node and per pod/container, via node-exporter and kube-state-metrics.
 
