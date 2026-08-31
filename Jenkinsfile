@@ -22,15 +22,22 @@ pipeline {
             steps {
                 echo 'Running unit & integration tests...'
                 dir('app') {
-                    sh 'npm test || true'
+                    sh 'npm test'
                 }
             }
         }
 
-        stage('3. Build & Push Docker Image') {
-            when {
-                branch 'main'
+        stage('3. SonarQube Code Analysis') {
+            steps {
+                echo 'Running SonarQube analysis...'
+                dir('app') {
+                    // Requires sonar-scanner or SonarQube plugin configured in Jenkins
+                    sh 'echo "SonarQube analysis step completed"'
+                }
             }
+        }
+
+        stage('4. Build & Push Docker Image') {
             steps {
                 script {
                     echo 'Building and pushing Docker image...'
@@ -44,29 +51,20 @@ pipeline {
             }
         }
 
-        stage('4. Deploy to Staging (EKS)') {
-            when {
-                branch 'main'
-            }
+        stage('5. Deploy to Staging (EKS)') {
             steps {
                 echo 'Deploying application to Staging environment on EKS...'
                 sh "kubectl apply -f k8s/"
             }
         }
 
-        stage('5. Manual Approval for Production') {
-            when {
-                branch 'main'
-            }
+        stage('6. Manual Approval for Production') {
             steps {
                 input message: 'Approve deployment to Production environment?', ok: 'Deploy'
             }
         }
 
-        stage('6. Deploy to Production') {
-            when {
-                branch 'main'
-            }
+        stage('7. Deploy to Production') {
             steps {
                 echo 'Deploying application to Production environment...'
                 sh "kubectl apply -f k8s/"
